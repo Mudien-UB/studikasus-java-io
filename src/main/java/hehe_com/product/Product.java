@@ -19,13 +19,13 @@ public class Product {
     
     private LocalDateTime updatedAt;
     
-    public Product(long id, String name, BigDecimal price, int stock, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Product(long id, String name, BigDecimal price, int stock, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stock = stock;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.updatedAt = createdAt;
     }
     
     public LocalDateTime getCreatedAt() {
