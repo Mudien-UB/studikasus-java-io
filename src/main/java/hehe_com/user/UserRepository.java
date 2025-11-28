@@ -8,7 +8,11 @@ import java.util.Date;
 
 public class UserRepository {
     
-    private static final Path USER_DIR = Paths.get("data/users");
+    private final Path USER_DIR;
+    
+    public UserRepository(Path USER_DIR) {
+        this.USER_DIR = USER_DIR;
+    }
     
     public void save(Users user) {
         try {

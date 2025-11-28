@@ -6,6 +6,8 @@ import hehe_com.user.UserRepository;
 import hehe_com.user.UserService;
 
 import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class App {
@@ -14,7 +16,9 @@ public class App {
                 Scanner scanner = new Scanner(System.in);
                 PrintStream printStream = new PrintStream(System.out)
         ) {
-            UserRepository userRepository = new UserRepository();
+            String pathUserDir = "data/users";
+            Path USER_DIR = Paths.get(pathUserDir);
+            UserRepository userRepository = new UserRepository(USER_DIR);
             UserService userService = new UserService(userRepository);
             UserContoller userContoller = new UserContoller(userService, scanner, printStream);
             

@@ -28,6 +28,7 @@ public class UserService {
         user.setPassword( PasswordUtil.hashPassword(password));
         
         repository.save(user);
+        repository.saveLogin(user);
         
         return user;
     }
