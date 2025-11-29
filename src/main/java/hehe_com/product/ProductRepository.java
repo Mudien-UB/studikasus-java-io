@@ -1,12 +1,11 @@
 package hehe_com.product;
 
+import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,9 +22,11 @@ public class ProductRepository {
     private final Path PRODUCTS_FILE;
     private static final ObjectMapper mapper = new ObjectMapper()
             // serialization feature
+            .registerModule(new JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false)
             .configure(SerializationFeature.WRITE_BIGDECIMAL_AS_PLAIN, true)
             .configure(SerializationFeature.INDENT_OUTPUT, true)
-            
+
             // deserialization feature
             .configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -66,8 +67,7 @@ public class ProductRepository {
     
     private List<Product> load() {
         try {
-            return mapper.readValue(PRODUCTS_FILE.toFile(), new TypeReference<List<Product>>() {
-            });
+            return mapper.readValue(PRODUCTS_FILE.toFile(), new TypeReference<List<Product>>(){});
         } catch (StreamReadException e) {
             throw new RuntimeException(e);
         } catch (DatabindException e) {
@@ -110,9 +110,9 @@ public class ProductRepository {
     public Product saveNew(Product newProduct) {
         try {
             List<Product> products = this.load();
-            
+
             if (products.contains(newProduct)) throw new RuntimeException();
-            
+
             products.add(newProduct);
             save(products);
             return newProduct;
@@ -151,15 +151,6 @@ public class ProductRepository {
     public List<Product> loadAll() {
         try {
             return this.load();
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    public List<Product> loadAll(Predicate<Product> filter) {
-        try {
-            List<Product> products = this.loadAll();
-            return products.stream().filter(filter).toList();
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
