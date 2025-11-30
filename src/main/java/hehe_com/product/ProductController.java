@@ -51,7 +51,7 @@ public class ProductController {
             print.print("==> ");
             
             switch (inputReader.getInput(Character.class, '\0')) {
-                case 'V' -> viewDetailsProduct();
+                case 'V', 'v' -> viewDetailsProduct();
                 case 'A', 'a' -> addProduct();
                 case 'U', 'u' -> updateProduct();
                 case 'D', 'd' -> deleteProduct();
@@ -90,6 +90,7 @@ public class ProductController {
         } else {
             detailProduct(product);
         }
+        inputReader.getInput(String.class);
     }
     
     public void addProduct() {
@@ -187,6 +188,7 @@ public class ProductController {
         print.println("Price: " + product.getPrice());
         print.println("Stock: " + product.getStock());
         print.println("Updated at: " + product.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm")));
+        print.println("Created at: " + product.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm")));
     }
     
 }
