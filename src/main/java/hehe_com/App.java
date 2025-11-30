@@ -51,18 +51,23 @@ public class App {
                         }
                     }
                     case 2 -> {
-                        while (true) {
                             MenuProductResult res = productController.menu();
-                            if (res != MenuProductResult.CONTINUE) break;
-                        }
+                            if (res == MenuProductResult.EXIT) {
+                                sayGoodbye();
+                                return;
+                            }
                     }
                     case 0 -> {
-                        printStream.println("Bye Bye");
+                        sayGoodbye();
                         running = false;
                     }
                     default -> printStream.println("Invalid input");
                 }
             }
         }
+    }
+    
+    private static void sayGoodbye() {
+        System.out.println("Goodbye!");
     }
 }

@@ -5,7 +5,6 @@ import hehe_com.utils.InputUtil;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.io.PrintStream;
 import java.util.function.Predicate;
@@ -32,19 +31,53 @@ public class ProductController {
     }
     
     public MenuProductResult menu() {
-        printMenu();
-        print.print("==> ");
-        switch (Integer.parseInt(scanner.nextLine())) {
-            case 1 -> listProducts();
-            case 2 -> addProduct();
-            case 3 -> updateProduct();
-            case 4 -> deleteProduct();
-            case 0 -> {
-                return MenuProductResult.BACK;
+        Predicate<Product> predicate = null;
+        PRODUCT_SORT_FIELD sortField = null;
+        boolean isAsc = true;
+        List<Product> products;
+        
+        while (true) {
+            products = productService.getAllProducts(predicate, sortField, isAsc);
+            products.forEach(print::println);
+            print.println(
+                    "[A] Add Product" +
+                            " | [U] Update Product" +
+                            " | [D] Delete Product" +
+                            " | [F] Filter " + ((predicate != null) ? " [R] Reset " : "") +
+                            " | [S] Sort" +
+                            " | [T] " + (isAsc ? "Ascending" : "Descending") +
+                            " | [Q] Back" +
+                            " | [X] Exit"
+            );
+            print.print("==> ");
+            
+            switch (InputUtil.getRequiredChar(scanner)) {
+                case 'A', 'a' -> addProduct();
+                case 'U', 'u' -> updateProduct();
+                case 'D', 'd' -> deleteProduct();
+                case 'F', 'f' -> predicate = this.filterMenuListProducts();
+                case 'R','r' -> predicate = null;
+                case 'S', 's' -> {
+                    print.println("Available sort fields:");
+                    print.println("1. by Name | 2. by Price | 3. by Stock");
+                    print.print("==> ");
+                    sortField = switch (Integer.parseInt(scanner.nextLine())) {
+                        case 1 -> PRODUCT_SORT_FIELD.NAME;
+                        case 2 -> PRODUCT_SORT_FIELD.PRICE;
+                        case 3 -> PRODUCT_SORT_FIELD.STOCK;
+                        default -> null;
+                    };
+                }
+                case 'T','t' -> isAsc = !isAsc;
+                case 'Q', 'q' -> {
+                    return MenuProductResult.BACK;
+                }
+                case 'X','x' -> {
+                    return MenuProductResult.EXIT;
+                }
+                default -> print.println("Invalid choice.");
             }
-            default -> print.println("Invalid choice.");
         }
-        return MenuProductResult.CONTINUE;
     }
     
     public void addProduct() {
@@ -88,57 +121,15 @@ public class ProductController {
         Product product = productService.getProductById(id);
         
         if (product != null) {
-            
-            print.println("=[ " + product.getId()+ " | " + product.getName() + " ]=");
+            print.println("=[ " + product.getId() + " | " + product.getName() + " ]=");
             print.print("type 'n' for cancel, press enter to confirm => ");
             
-            Character confirm = InputUtil.getInput(scanner, Character.class);
+            Character confirm = InputUtil.getRequiredChar(scanner);
             if (confirm.equals('N') || confirm.equals('n')) return;
             productService.deleteProduct(id);
             print.println("Product deleted: " + product.getName());
         } else {
             print.println("Product not found.");
-        }
-    }
-    
-    public void listProducts() {
-        Predicate<Product> filter = null;
-        PRODUCT_SORT_FIELD filterField = null;
-        PRODUCT_SORT_FIELD sortField = null;
-        boolean isAsc = true;
-        List<Product> products;
-        
-        while (true) {
-            products = productService.getAllProducts(filter, sortField, isAsc);
-            print.println("=-- Products : --=");
-            products.forEach(print::println);
-            
-            print.println("[ 1. Filter "+ ((filter == null) ? "All" : filter.getClass().getSimpleName()) +
-                    "| 2. " + ((sortField == null) ? "Sort" : "Sorted by " + sortField.getValue()) +
-                    " | 3. " + (isAsc ? "Asc" : "Desc") +
-                    " | 0. Back ]"
-            );
-            print.print("==> ");
-            
-            switch (Integer.parseInt(scanner.nextLine())) {
-                case 1 -> filter = this.filterMenuListProducts();
-                case 2 -> {
-                    print.println("Available sort fields:");
-                    print.println("1. by Name | 2. by Price | 3. by Stock");
-                    print.print("==> ");
-                    sortField = switch (Integer.parseInt(scanner.nextLine())) {
-                        case 1 -> PRODUCT_SORT_FIELD.NAME;
-                        case 2 -> PRODUCT_SORT_FIELD.PRICE;
-                        case 3 -> PRODUCT_SORT_FIELD.STOCK;
-                        default -> null;
-                    };
-                }
-                case 3 -> isAsc = !isAsc;
-                case 0 -> {
-                    return;
-                }
-                default -> print.println("Invalid choice.");
-            }
         }
     }
     
@@ -155,10 +146,10 @@ public class ProductController {
             case 2 -> {
                 print.println("Filter range price:");
                 print.print("Min price: ");
-                BigDecimal minPrice = InputUtil.getInput(scanner,BigDecimal.class);
+                BigDecimal minPrice = InputUtil.getInput(scanner, BigDecimal.class);
                 print.print("Max price (if null, will equal min): ");
-                BigDecimal maxPrice = InputUtil.getInput(scanner,BigDecimal.class);
-                scanner.nextLine();
+                BigDecimal maxPrice = InputUtil.getInput(scanner, BigDecimal.class);
+                
                 yield product -> (maxPrice == null)
                         ? product.getPrice().compareTo(minPrice) == 0
                         : product.getPrice().compareTo(minPrice) >= 0 && product.getPrice().compareTo(maxPrice) <= 0;
@@ -167,9 +158,9 @@ public class ProductController {
                 print.println("Filter range stock:");
                 print.print("Min stock: ");
                 int minStock = scanner.nextInt();
-                print.print("Max stock: ");
-                Integer maxStock = scanner.nextInt();
-                scanner.nextLine();
+                print.print("Max stock (if null, will equal min): ");
+                Integer maxStock = InputUtil.getInput(scanner, Integer.class);
+                
                 yield product -> (maxStock == null)
                         ? product.getStock() == minStock
                         : product.getStock() >= minStock && product.getStock() <= maxStock;

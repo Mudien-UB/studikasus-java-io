@@ -38,7 +38,7 @@ public class ProductService {
             Product product = productRepository.findById(id);
             product.setName((name == null) ? product.getName() : name);
             product.setPrice((price == null) ? product.getPrice() : price);
-            product.setStock(stock == 0 ? product.getStock() : stock);
+            product.setStock((stock == null) ? product.getStock() : stock);
             
             return productRepository.saveUpdated(product);
         }catch(RuntimeException e){
@@ -69,8 +69,8 @@ public class ProductService {
     public List<Product> getAllProducts(Predicate<Product> predicate,PRODUCT_SORT_FIELD sortField, Boolean isAsc) {
         try{
             List<Product> products;
-            if(predicate == null ) products = productRepository.loadAll();
-            else products = productRepository.loadAll().stream().filter(predicate).toList();
+            if(predicate != null ) products = productRepository.loadAll().stream().filter(predicate).toList();
+            else products = productRepository.loadAll();
             
             if(sortField != null){
                 Comparator<Product> comparator = switch (sortField){
@@ -81,7 +81,7 @@ public class ProductService {
                 };
                 return products.stream().sorted((isAsc != null && !isAsc) ? comparator.reversed() : comparator).toList();
             }else{
-                return products;
+                return isAsc ? products : products.reversed();
             }
             
         }catch(RuntimeException e){

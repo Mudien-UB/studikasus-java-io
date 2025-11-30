@@ -1,6 +1,5 @@
 package hehe_com.utils;
 
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.Scanner;
 
@@ -10,7 +9,7 @@ public class InputUtil {
     public static <T> T getInput(Scanner scanner, Class<T> type) {
         String input = scanner.nextLine();
         
-        if (input.isBlank()) return null;
+        if (input.isEmpty()) return null;
         
         try {
             
@@ -26,6 +25,12 @@ public class InputUtil {
         } catch (Exception e) {
             return null;
         }
+    }
+    
+    public static char getRequiredChar(Scanner scanner) {
+        String input = scanner.nextLine();
+        if("".equals(input)) return '\0';
+        return input.charAt(0);
     }
     
 }
