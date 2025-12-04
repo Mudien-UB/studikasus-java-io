@@ -1,18 +1,19 @@
 package hehe_com.user;
 
+import hehe_com.console.InputReader;
+
 import java.io.PrintStream;
-import java.util.Scanner;
 
 public class UserContoller {
     
     private final UserService userService;
-    private final Scanner scanner;
+    private final InputReader inputReader;
     private final PrintStream print;
     private Users userLogin;
     
-    public UserContoller(UserService userService, Scanner scanner, PrintStream print) {
+    public UserContoller(UserService userService, InputReader inputReader, PrintStream print) {
         this.userService = userService;
-        this.scanner = scanner;
+        this.inputReader = inputReader;
         this.print = print;
         userLogin = userService.getUserLogin();
     }
@@ -26,7 +27,7 @@ public class UserContoller {
             print.println("0. Back");
             print.print("==> ");
             
-            switch (scanner.nextInt()) {
+            switch (inputReader.getInput(Integer.class, -1)) {
                 case 1 -> this.register();
                 case 2 -> this.login();
                 case 0 -> {return MenuUserResult.BACK;}
@@ -40,7 +41,7 @@ public class UserContoller {
             print.println("0. Back");
             print.print("==> ");
             
-            switch (scanner.nextInt()) {
+            switch (inputReader.getInput(Integer.class, -1)) {
                 case 1 -> this.showProfile();
                 case 2 -> {
                     this.logout();
@@ -63,9 +64,9 @@ public class UserContoller {
         
         print.println(" === Login === ");
         print.print(" Username: ");
-        String username = scanner.next();
+        String username = inputReader.getInput(String.class);
         print.print(" Password: ");
-        String password = scanner.next();
+        String password = inputReader.getInput(String.class);
         
         userLogin = userService.Login(username.toLowerCase(), password);
     }
@@ -74,11 +75,11 @@ public class UserContoller {
         if (userLogin != null) return;
         print.println(" === Register ===");
         print.print(" Username: ");
-        String username = scanner.next();
+        String username = inputReader.getInput(String.class, print);
         print.print(" Email: ");
-        String email = scanner.next();
+        String email = inputReader.getInput(String.class, print);
         print.print(" Password: ");
-        String password = scanner.next();
+        String password = inputReader.getInput(String.class, print);
         
         userLogin = userService.createUser(username.toLowerCase(), email.toLowerCase(), password);
     }

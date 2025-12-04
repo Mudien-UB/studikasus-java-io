@@ -29,7 +29,7 @@ public class App {
             // user
             UserRepository userRepository = new UserRepository(USER_DIR);
             UserService userService = new UserService(userRepository);
-            UserContoller userController = new UserContoller(userService, scanner, printStream);
+            UserContoller userController = new UserContoller(userService, inputReader, printStream);
             
             // product
             ProductRepository productRepository = new ProductRepository(PRODUCT_DIR);
