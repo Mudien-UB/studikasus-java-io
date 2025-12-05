@@ -1,6 +1,9 @@
 package hehe_com;
 
 import hehe_com.console.InputReader;
+import hehe_com.order.OrderController;
+import hehe_com.order.OrderRepository;
+import hehe_com.order.OrderService;
 import hehe_com.product.MenuProductResult;
 import hehe_com.product.ProductController;
 import hehe_com.product.ProductRepository;
@@ -23,6 +26,7 @@ public class App {
         ) {
             Path USER_DIR = Paths.get("data/users");
             Path PRODUCT_DIR = Paths.get("data/products");
+            Path ORDER_DIR = Paths.get("data/orders");
             
             InputReader inputReader = new InputReader(scanner);
             
@@ -36,11 +40,17 @@ public class App {
             ProductService productService = new ProductService(productRepository);
             ProductController productController = new ProductController(productService, inputReader, printStream);
             
+            // order
+            OrderRepository orderRepository = new OrderRepository(ORDER_DIR);
+            OrderService orderService = new OrderService(orderRepository,productRepository,userRepository);
+            OrderController orderController = new OrderController(inputReader,orderService,productService,printStream,userService);
+            
             boolean running = true;
             while (running) {
                 printStream.println("=== My Application ===");
                 printStream.println("1. Profile");
                 printStream.println("2. Product");
+                printStream.println("3. Order");
                 printStream.println("0. Exit");
                 printStream.print("==> ");
                 
@@ -59,6 +69,9 @@ public class App {
                             sayGoodbye();
                             return;
                         }
+                    }
+                    case 3 -> {
+                        orderController.menu();
                     }
                     case 0 -> {
                         sayGoodbye();
