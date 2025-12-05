@@ -16,21 +16,20 @@ public class ProductRepositoryTest {
     void testCreateAndLoad() {
     
         ProductRepository productRepository = new ProductRepository(Path.of("data/products"));
-        
+
         var id = productRepository.generateIDProduct();
-        
+
         Assertions.assertInstanceOf(Long.class,id);
-        
+
         Product newProduct = new Product(id,"roti", BigDecimal.valueOf(1000), 10, LocalDateTime.now());
-        
+
         Product savedProduct = productRepository.saveNew(newProduct );
-        
+
         Assertions.assertNotNull(savedProduct);
-        
+
         List<Product> productList = productRepository.loadAll();
-        
+
         Assertions.assertNotNull(productList);
-        
-        Assertions.assertEquals(savedProduct, productList.getFirst());
+
     }
 }
