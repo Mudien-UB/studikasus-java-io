@@ -8,10 +8,7 @@ import hehe_com.product.MenuProductResult;
 import hehe_com.product.ProductController;
 import hehe_com.product.ProductRepository;
 import hehe_com.product.ProductService;
-import hehe_com.user.MenuUserResult;
-import hehe_com.user.UserContoller;
-import hehe_com.user.UserRepository;
-import hehe_com.user.UserService;
+import hehe_com.user.*;
 
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -47,10 +44,13 @@ public class App {
             
             boolean running = true;
             while (running) {
+                Users userLogin = userController.getUserLogin();
                 printStream.println("=== My Application ===");
                 printStream.println("1. Profile");
-                printStream.println("2. Product");
-                printStream.println("3. Order");
+                if(userLogin != null) {
+                    printStream.println("2. Product");
+                    printStream.println("3. Order");
+                }
                 printStream.println("0. Exit");
                 printStream.print("==> ");
                 
@@ -64,26 +64,37 @@ public class App {
                         }
                     }
                     case 2 -> {
+                        if(userLogin == null) {
+                            printStream.println("Please Log in");
+                            continue;
+                        }
                         MenuProductResult res = productController.menu();
                         if (res == MenuProductResult.EXIT) {
-                            sayGoodbye();
+                            printStream.println("Bye");
                             return;
                         }
                     }
                     case 3 -> {
+                        if(userLogin == null) {
+                            printStream.println("Please Log in");
+                            continue;
+
+                        }
                         orderController.menu();
                     }
                     case 0 -> {
-                        sayGoodbye();
+                        printStream.println("Bye!");
                         running = false;
                     }
-                    default -> printStream.println("Invalid input");
+                    default -> {
+                        if(userLogin == null) {
+                            printStream.println("Please Log in");
+                        }else{
+                            printStream.println("Invalid input");
+                        }
+                    }
                 }
             }
         }
-    }
-    
-    private static void sayGoodbye() {
-        System.out.println("Goodbye!");
     }
 }

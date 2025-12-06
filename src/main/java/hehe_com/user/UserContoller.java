@@ -9,17 +9,15 @@ public class UserContoller {
     private final UserService userService;
     private final InputReader inputReader;
     private final PrintStream print;
-    private Users userLogin;
     
     public UserContoller(UserService userService, InputReader inputReader, PrintStream print) {
         this.userService = userService;
         this.inputReader = inputReader;
         this.print = print;
-        userLogin = userService.getUserLogin();
     }
     
     public MenuUserResult menu() {
-        
+        Users userLogin = userService.getUserLogin();
         if (userLogin == null) {
             print.println("=== Welcome ===");
             print.println("1. Register");
@@ -55,11 +53,11 @@ public class UserContoller {
     }
     
     public Users getUserLogin() {
-        return this.userLogin;
+        return userService.getUserLogin();
     }
     
     public void login() {
-        
+        Users userLogin = userService.getUserLogin();
         if (userLogin != null) return;
         
         print.println(" === Login === ");
@@ -72,6 +70,7 @@ public class UserContoller {
     }
     
     public void register() {
+        Users userLogin = userService.getUserLogin();
         if (userLogin != null) return;
         print.println(" === Register ===");
         print.print(" Username: ");
@@ -85,13 +84,15 @@ public class UserContoller {
     }
     
     public void logout() {
+
+        Users userLogin = userService.getUserLogin();
         if (userLogin == null) return;
         userService.logout();
-        userLogin = null;
         print.println(" === Logout ===");
     }
     
     public void showProfile() {
+        Users userLogin = userService.getUserLogin();
         if (userLogin == null) return;
         print.println("+ === Profile ===");
         print.println("| Username: " + userLogin.getUsername());
